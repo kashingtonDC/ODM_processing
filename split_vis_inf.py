@@ -29,7 +29,7 @@ for fn in files[:]:
 
 
 for imtype, files in imtype_dict.items():
-	imtype_outdir = target_dir + "_" + imtype
+	imtype_outdir = target_dir[:-1] + "_" + imtype
 
 	if not os.path.exists(imtype_outdir):
 		os.mkdir(imtype_outdir)
