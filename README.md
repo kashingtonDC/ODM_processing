@@ -1,8 +1,8 @@
 # regular orthophoto
-docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets project2
+docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets <FOLDER_NAME>
 
 # DSM
-docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets NYE_vis --dsm
+docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets <FOLDER_NAME> --dtm --dem-resolution 2 --smrf-threshold 0.4 --smrf-window 24
 
 
 # TODO: 
