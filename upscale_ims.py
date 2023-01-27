@@ -19,7 +19,8 @@ print("RESIZING IMAGES")
 
 for fn in tqdm(files[:]):
 	image = Image.open(fn)
-	new_img = image.resize((int(4056/2),int(3040/2)))
+	width, height = image.size
+	new_img = image.resize((int(width/2),int(height/2)))
 	new_img.save(fn, "JPEG", optimize=True)
 
 print("*****"  * 15)
