@@ -105,7 +105,7 @@ def get_ims(ImageCollection, var_name, scale_factor, native_res, startdate, endd
 	results_out = [item for sublist in results for item in sublist]
 	return results_out
 
-def get_sentinel(geometry, startdate = '2020-12-01', enddate =  '2023-01-01'):
+def get_sentinel(geometry, startdate = '2022-01-01', enddate =  '2023-01-01'):
 	# Get rgb bands For sentinel 
 
 	r = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B2', 0.0001, 10, startdate, enddate, geometry)
@@ -117,7 +117,7 @@ def get_sentinel(geometry, startdate = '2020-12-01', enddate =  '2023-01-01'):
 	
 	return rgb
 
-def get_naip(geometry, startdate ='2018-01-01', enddate = '2023-01-01'):
+def get_naip(geometry, startdate ='2020-01-01', enddate = '2023-01-01'):
 
 	r = get_ims(ee.ImageCollection("USDA/NAIP/DOQQ"), 'R', 1, 3, startdate, enddate, geometry)
 	g = get_ims(ee.ImageCollection("USDA/NAIP/DOQQ"), 'G', 1, 3, startdate, enddate, geometry)
@@ -174,7 +174,7 @@ def main():
 			print(cmd)
 
 	# For each reprojected file, get convex hull, write pngs of sentinel and naip 
-	for rpj_fn in tqdm(rpj_fns[:]):
+	for rpj_fn in tqdm(rpj_fns[::-1]):
 		print("=====" * 10 )
 		print(rpj_fn)
 		# read fn
