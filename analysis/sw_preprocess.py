@@ -1,6 +1,9 @@
 import os
 import ee
+import time
+import datetime
 import rioxarray
+import dateutil.relativedelta
 
 import numpy as np
 import pandas as pd
@@ -79,14 +82,16 @@ def get_ims(ImageCollection, var_name, scale_factor, native_res, startdate, endd
 	area -> ee.Geometry object 
 	
 	'''
-	dt_idx = pd.date_range(startdate,enddate, freq='MS')
-	ims = []
-
 	start = ee.Date(startdate)
 	end = ee.Date(enddate)
 	im = ee.ImageCollection(ImageCollection.filterBounds(area).filterDate(start, end).set('system:time_start', end.millis()).select(var_name).mean())
 	result = im.getRegion(area,native_res,"epsg:4326").getInfo()
 	header, data = result[0], result[1:]
+
+	datecollection = ImageCollection.filterDate(start,end)
+	date = ee.Date(datecollection.first().get('system:time_start'))
+	date_dict = date.format('Y-M-d').getInfo()
+	print(date_dict)
 
 	df = pd.DataFrame(np.column_stack(data).T, columns = header)
 	df.latitude = pd.to_numeric(df.latitude)
@@ -105,17 +110,33 @@ def get_ims(ImageCollection, var_name, scale_factor, native_res, startdate, endd
 	results_out = [item for sublist in results for item in sublist]
 	return results_out
 
-def get_sentinel(geometry, startdate = '2022-01-01', enddate =  '2023-01-01'):
+def get_sentinel(geometry, im_ac_date):
+	
+	# advance the date +/- 1 week from drone acquisition time 
+	# start = ee.Date(im_ac_date).advance(-1,'month')
+	# end = ee.Date(im_ac_date).advance(1,'month')
+
+	im_ac_dt = datetime.datetime.strptime(im_ac_date, "%Y-%m-%d")
+	start = im_ac_dt - dateutil.relativedelta.relativedelta(days=3)
+	end = im_ac_dt + dateutil.relativedelta.relativedelta(days=3)
+
+	# print(start,end)
+
 	# Get rgb bands For sentinel 
 
-	r = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B2', 0.0001, 10, startdate, enddate, geometry)
-	g = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B3', 0.0001, 10, startdate, enddate, geometry)
-	b = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B4', 0.0001, 10, startdate, enddate, geometry)
+	r = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B2', 0.0001, 10, start, end, geometry)
+	g = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B3', 0.0001, 10, start, end, geometry)
+	b = get_ims(ee.ImageCollection("COPERNICUS/S2_HARMONIZED"), 'B4', 0.0001, 10, start, end, geometry)
 
 	rn,gn,bn = normalize(r[0]), normalize(g[0]), normalize(b[0])
 	rgb = np.dstack((rn,gn,bn))
+
+	# return the date
+	collection = ee.ImageCollection("COPERNICUS/S2_HARMONIZED").filterDate(start,end)
+	date = ee.Date(collection.first().get('system:time_start'))
+	date_dict = date.format('Y-M-d').getInfo()
 	
-	return rgb
+	return rgb, date_dict
 
 def get_naip(geometry, startdate ='2020-01-01', enddate = '2023-01-01'):
 
@@ -127,7 +148,14 @@ def get_naip(geometry, startdate ='2020-01-01', enddate = '2023-01-01'):
 	rn,gn,bn = normalize(r[0]), normalize(g[0]), normalize(b[0])
 	rgb = np.dstack((rn,gn,bn))
 	
-	return rgb
+	# return the date
+	start = ee.Date(startdate)
+	end = ee.Date(enddate)
+	collection = ee.ImageCollection("USDA/NAIP/DOQQ").filterDate(start,end)
+	date = ee.Date(collection.first().get('system:time_start'))
+	date_dict = date.format('Y-M-d').getInfo()
+
+	return rgb, date_dict
 
 def normalize(array):
 	"""Normalizes numpy arrays into scale 0.0 - 1.0"""
@@ -173,6 +201,8 @@ def main():
 			os.system(cmd)
 			print(cmd)
 
+
+
 	# For each reprojected file, get convex hull, write pngs of sentinel and naip 
 	for rpj_fn in tqdm(rpj_fns[::-1]):
 		print("=====" * 10 )
@@ -199,28 +229,43 @@ def main():
 
 		# Define EE aoi
 		aoi = gdf_to_ee_poly(gdf)
-		 
+
+		# Lookup date based on name of fn 
+		site_name = os.path.split(shpfn)[-1].split(".")[0]
+
+		site_date_lookup = {"KanabDam_vis" : "2022-03-22",
+							"KanabRiver_vis" : "2022-03-25",
+							"KanabRiver_tir" : "2022-03-25",
+							"OceanoDunes_vis": "2022-12-29",
+							"OceanoDunes_tir": "2022-12-29",
+							"OsoFlacoLake_vis": "2022-12-21",
+							"OsoFlacoRiver_vis": "2022-12-21"}
+
+		# print(site_name)
+		# print(type(site_name))
+		print(site_date_lookup[site_name])
+
 		# Get naip and plot
 		try:
-			naip = get_naip(aoi)
+			naip,naip_date = get_naip(aoi)
 			alpha = np.ma.masked_invalid(naip[:,:,0]).data.astype(float)
 			alpha[~np.isnan(alpha)] = 1
 			naipim = Image.fromarray((np.dstack([naip, alpha]) * 255).astype(np.uint8))
 
 			naiprgb = naipim.convert('RGBA') # color image
 			naiprgb.save(rpj_fn.replace("wgs84",'pngs').replace('.tif','_naip.png'))
-			print("WROTE NAIP")
+			print("WROTE NAIP for {}".format(naip_date))
 		except:
 			time.sleep(0.0)
 			
 		# Get sentinel and plot 
-		s1 = get_sentinel(aoi)
+		s1, s1_date = get_sentinel(aoi, im_ac_date = site_date_lookup[site_name])
 		alpha = np.ma.masked_invalid(s1[:,:,0]).data.astype(float)
 		alpha[~np.isnan(alpha)] = 1
 		s1im = Image.fromarray((np.dstack([s1,alpha]) * 255).astype(np.uint8))
 		s1imrgb = s1im.convert('RGBA') # color image
 		s1imrgb.save(rpj_fn.replace("wgs84",'pngs').replace('.tif','_s1.png'))
-		print("WROTE S1")
+		print("WROTE S1 for {}".format(s1_date))
 
 if __name__ == "__main__":
 	main()
