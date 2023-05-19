@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_1060fd1b28cdd06544435dee8c33a439 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.2/Control.FullScreen.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ljagis/leaflet-measure@2.1.7/dist/leaflet-measure.min.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_1060fd1b28cdd06544435dee8c33a439" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_1060fd1b28cdd06544435dee8c33a439 = L.map(
+                "map_1060fd1b28cdd06544435dee8c33a439",
+                {
+                    center: [20.0, 0.0],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 2,
+                    zoomControl: true,
+                    preferCanvas: false,
+                    drawControl: true,
+                    googleMap: "HYBRID",
+                    drawExport: false,
+                    layersControl: true,
+                }
+            );
+            L.control.scale().addTo(map_1060fd1b28cdd06544435dee8c33a439);
+
+            
+
+        
+    
+            var tile_layer_53ca2afb3f23ffcbf57f697290af5eb2 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca target=\"_blank\" href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca target=\"_blank\" href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 24, "maxZoom": 24, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+    
+            L.control.fullscreen(
+                {"forceSeparateButton": false, "position": "topleft", "title": "Full Screen", "titleCancel": "Exit Full Screen"}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+    
+            var options = {
+              position: "topleft",
+              draw: {},
+              edit: {},
+            }
+            // FeatureGroup is to store editable layers.
+            var drawnItems = new L.featureGroup().addTo(
+                map_1060fd1b28cdd06544435dee8c33a439
+            );
+            options.edit.featureGroup = drawnItems;
+            var draw_control_748d3ff12a4ae103129a62d68ac8fe6e = new L.Control.Draw(
+                options
+            ).addTo( map_1060fd1b28cdd06544435dee8c33a439 );
+            map_1060fd1b28cdd06544435dee8c33a439.on(L.Draw.Event.CREATED, function(e) {
+                var layer = e.layer,
+                    type = e.layerType;
+                var coords = JSON.stringify(layer.toGeoJSON());
+                layer.on('click', function() {
+                    alert(coords);
+                    console.log(coords);
+                });
+                drawnItems.addLayer(layer);
+             });
+            map_1060fd1b28cdd06544435dee8c33a439.on('draw:created', function(e) {
+                drawnItems.addLayer(e.layer);
+            });
+            
+        
+    
+            var measure_control_14aa6ad0c00920637209f63c9e1ca248 = new L.Control.Measure(
+                {"position": "bottomleft", "primaryAreaUnit": "sqmeters", "primaryLengthUnit": "meters", "secondaryAreaUnit": "acres", "secondaryLengthUnit": "miles"});
+            map_1060fd1b28cdd06544435dee8c33a439.addControl(measure_control_14aa6ad0c00920637209f63c9e1ca248);
+
+        
+    
+            L.Control.geocoder(
+                {"collapsed": true, "defaultMarkGeocode": true, "position": "topleft"}
+            ).on('markgeocode', function(e) {
+                map_1060fd1b28cdd06544435dee8c33a439.setView(e.geocode.center, 11);
+            }).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+
+        
+    
+            var tile_layer_d225e5b76c13f9e0ac9ca8469e7e4431 = L.tileLayer(
+                "https://mt1.google.com/vt/lyrs=y\u0026x={x}\u0026y={y}\u0026z={z}",
+                {"attribution": "Google", "detectRetina": false, "maxNativeZoom": 22, "maxZoom": 22, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+    
+            map_1060fd1b28cdd06544435dee8c33a439.fitBounds(
+                [[20, 0], [20, 0]],
+                {"maxZoom": 2}
+            );
+        
+    
+            var tile_layer_7be8d02201e7eec4c235cb67bb8c3d6e = L.tileLayer(
+                "http://127.0.0.1:51394/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2FUsers%2Faakashahamed%2FDesktop%2Fdatasets%2Fcomposites%2FKanabRiver_vis.tif\u0026n_colors=255\u0026projection=EPSG%3A3857",
+                {"attribution": "Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 100, "maxZoom": 100, "minZoom": 0, "noWrap": false, "opacity": 1, "showLoading": false, "subdomains": "abc", "tms": false}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+    
+            map_1060fd1b28cdd06544435dee8c33a439.fitBounds(
+                [[37.075931702189145, -112.5414128960938], [37.07853736348679, -112.53869462654386]],
+                {}
+            );
+        
+    
+            var tile_layer_9e7b91ef2d970afb6a1a624ec0f865ce = L.tileLayer(
+                "http://127.0.0.1:51394/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2FUsers%2Faakashahamed%2FDesktop%2Fdatasets%2Fcomposites%2FKanabRiver_tir.tif\u0026n_colors=255\u0026projection=EPSG%3A3857",
+                {"attribution": "Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.", "colormap": "terrain", "detectRetina": false, "maxNativeZoom": 100, "maxZoom": 100, "minZoom": 0, "noWrap": false, "opacity": 1, "showLoading": false, "subdomains": "abc", "tms": false}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+    
+            map_1060fd1b28cdd06544435dee8c33a439.fitBounds(
+                [[37.07626312015705, -112.54103516215622], [37.07796057013001, -112.5391602967722]],
+                {}
+            );
+        
+    
+            var layer_control_f086783a36b0432a28c9a62f0979530e = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_53ca2afb3f23ffcbf57f697290af5eb2,
+                },
+                overlays :  {
+                    "Google Satellite" : tile_layer_d225e5b76c13f9e0ac9ca8469e7e4431,
+                    "True Color" : tile_layer_7be8d02201e7eec4c235cb67bb8c3d6e,
+                    "TIR" : tile_layer_9e7b91ef2d970afb6a1a624ec0f865ce,
+                },
+            };
+            L.control.layers(
+                layer_control_f086783a36b0432a28c9a62f0979530e.base_layers,
+                layer_control_f086783a36b0432a28c9a62f0979530e.overlays,
+                {"autoZIndex": true, "collapsed": true, "position": "topright"}
+            ).addTo(map_1060fd1b28cdd06544435dee8c33a439);
+        
+</script>
+</html>
