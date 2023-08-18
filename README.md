@@ -19,3 +19,6 @@ Useful commands:
 
 # To generate a DEM and DSM 
 `docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets <FOLDER_NAME> --dtm --dem-resolution 2 --smrf-threshold 0.4 --smrf-window 24 && docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --project-path /datasets <FOLDER_NAME> --dsm --dem-resolution 2 --smrf-threshold 0.4 --smrf-window 24`
+
+# To un-flatten a distorted ed model
+`docker run -ti --rm -v /Users/aakashahamed/Desktop/datasets:/datasets opendronemap/odm --pc-quality medium --feature-quality medium --pc-filter 0 --project-path /datasets <FOLDER_NAME>`
